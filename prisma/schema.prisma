@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  email         String         @unique
+  name          String
+  password      String
+  role          Role           @default(USER)
+  posts         Post[]
+  comments      Comment[]
+  ratifications Ratification[]
+
+  @@index([name])
+  @@index([email])
+  @@index([username])
+  @@index([email, username])
+}
+
+model Post {
+  id            Int            @id @default(autoincrement())
+  title         String
+  content       String
+  authorId      Int
+  author        User           @relation(fields: [authorId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  comments      Comment[]
+  ratifications Ratification[]
+  reports       Report[]
+
+
+  @@index([content])
+  @@index([title])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([title, content])
+}
+
+model Comment {
+  id            Int            @id @default(autoincrement())
+  content       String
+  postId        Int
+  post          Post           @relation(fields: [postId], references: [id])
+  authorId      Int
+  author        User           @relation(fields: [authorId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  reports       Report[]
+  ratifications Ratification[]
+
+  @@index([content])
+  @@index([postId, authorId])
+  @@index([createdAt])
+}
+
+model Report {
+  id        Int          @id @default(autoincrement())
+  type      ReportType
+  status    ReportStatus @default(PENDING)
+  content   String
+  postId    Int?
+  commentId Int?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  post      Post?        @relation(fields: [postId], references: [id])
+  comment   Comment?     @relation(fields: [commentId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([postId, status])
+  @@index([createdAt])
+}
+
+model Ratification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int?
+  commentId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
+  comment   Comment? @relation(fields: [commentId], references: [id])
+
+  @@unique([userId, postId])
+  @@index([userId, postId])
+  @@index([userId, commentId])
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+  CREATOR
+  VERIFIED
+  USER
+}
+
+enum ReportType {
+  SPAM
+  INAPPROPRIATE
+  HARASSMENT
+  OFFENSIVE_LANGUAGE
+}
+
+enum ReportStatus {
+  PENDING
+  DONE
+  ARCHIVED
+  IGNORED
+  REJECTED
+}
