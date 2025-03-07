@@ -18,11 +18,23 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@app/common-dtos": [
+        "libs/common-dtos/src"
+      ],
+      "@app/common-dtos/*": [
+        "libs/common-dtos/src/*"
+      ],
       "@app/prisma": [
         "libs/prisma/src"
       ],
       "@app/prisma/*": [
         "libs/prisma/src/*"
+      ],
+      "@app/user": [
+        "libs/user/src"
+      ],
+      "@app/user/*": [
+        "libs/user/src/*"
       ]
     }
   }

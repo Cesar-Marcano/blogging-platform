@@ -11,7 +11,11 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
+    "@app/common-dtos": "<rootDir>/../libs/common-dtos/src",
+    "@app/common-dtos/(.*)": "<rootDir>/../libs/common-dtos/src/$1",
     "@app/prisma": "<rootDir>/../libs/prisma/src",
-    "@app/prisma/(.*)": "<rootDir>/../libs/prisma/src/$1"
+    "@app/prisma/(.*)": "<rootDir>/../libs/prisma/src/$1",
+    "@app/user": "<rootDir>/../libs/user/src",
+    "@app/user/(.*)": "<rootDir>/../libs/user/src/$1"
   }
 }

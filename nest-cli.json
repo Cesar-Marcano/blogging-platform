@@ -7,6 +7,15 @@
     "webpack": true
   },
   "projects": {
+    "common-dtos": {
+      "type": "library",
+      "root": "libs/common-dtos",
+      "entryFile": "index",
+      "sourceRoot": "libs/common-dtos/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common-dtos/tsconfig.lib.json"
+      }
+    },
     "prisma": {
       "type": "library",
       "root": "libs/prisma",
@@ -14,6 +23,15 @@
       "sourceRoot": "libs/prisma/src",
       "compilerOptions": {
         "tsConfigPath": "libs/prisma/tsconfig.lib.json"
+      }
+    },
+    "user": {
+      "type": "library",
+      "root": "libs/user",
+      "entryFile": "index",
+      "sourceRoot": "libs/user/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/user/tsconfig.lib.json"
       }
     }
   }
