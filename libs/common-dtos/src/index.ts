@@ -1,2 +1,1 @@
-export * from './common-dtos.module';
-export * from './common-dtos.service';
+export * from './dto/create-user.dto';
