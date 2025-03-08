@@ -44,15 +44,6 @@
         "tsConfigPath": "libs/prisma/tsconfig.lib.json"
       }
     },
-    "session": {
-      "type": "application",
-      "root": "apps/session",
-      "entryFile": "main",
-      "sourceRoot": "apps/session/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/session/tsconfig.app.json"
-      }
-    },
     "token": {
       "type": "library",
       "root": "libs/token",
