@@ -1,4 +1,4 @@
-import { CreateUserDto } from '@app/common-dtos';
+import { CreateUserDto } from '@app/common-dtos/dto/create-user.dto';
 import { UpdateUserDto } from '@app/common-dtos/dto/update-user.dto';
 import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
