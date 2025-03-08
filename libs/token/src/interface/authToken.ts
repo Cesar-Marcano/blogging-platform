@@ -19,7 +19,7 @@ export interface ClientInfo {
 }
 
 export interface AuthToken {
-  uuid: string;
+  uuid: string | null;
   type: TokenType;
   user: TokenUser;
   clientInfo: ClientInfo;

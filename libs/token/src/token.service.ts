@@ -20,7 +20,7 @@ export class TokenService {
       user,
       clientInfo,
       type: TokenType.REFRESH_TOKEN,
-      uuid: 'undefined',
+      uuid: null,
     };
 
     const sessionData: CreateSessionDto = {
