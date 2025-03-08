@@ -21,7 +21,7 @@ export class TokenService {
     try {
       const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
         secret: this.configService.get<string>(
-          `JWT_${TokenType[tokenType]}_TOKEN_SECRET`,
+          `JWT_${TokenType[tokenType]}_SECRET`,
         ),
       });
 
