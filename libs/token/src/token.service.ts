@@ -7,6 +7,7 @@ import { lastValueFrom } from 'rxjs';
 import { CreateSessionDto } from 'apps/auth/src/session/dto/create-session.dto';
 import { ConfigService } from '@nestjs/config';
 import { InvalidTokenException } from '@app/errors/invalidToken.error';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class TokenService {
@@ -16,20 +17,58 @@ export class TokenService {
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
   ) {}
 
-  async generateRefreshToken(user: User, clientInfo: ClientInfo) {
+  private validateToken(token: string, tokenType: TokenType): AuthToken {
+    try {
+      const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
+        secret: this.configService.get<string>(`JWT_${tokenType}_TOKEN_SECRET`),
+      });
+
+      if (payload.type !== tokenType) {
+        throw new InvalidTokenException(
+          `Invalid ${String(tokenType).toLowerCase()} token type`,
+        );
+      }
+
+      return payload;
+    } catch {
+      throw new InvalidTokenException(
+        `Invalid ${String(tokenType).toLowerCase()} token`,
+      );
+    }
+  }
+
+  private generateToken(
+    user: User,
+    clientInfo: ClientInfo,
+    tokenType: TokenType,
+    sessionUUID: string | null = null,
+  ) {
     const userPayload: AuthToken = {
       user,
       clientInfo,
-      type: TokenType.REFRESH_TOKEN,
-      uuid: null,
+      type: tokenType,
+      uuid: sessionUUID,
     };
+
+    return this.jwtService.sign(userPayload, {
+      expiresIn: this.configService.get<string>(
+        tokenType === TokenType.REFRESH_TOKEN
+          ? 'JWT_REFRESH_TOKEN_EXP'
+          : 'JWT_ACCESS_TOKEN_EXP',
+        tokenType === TokenType.REFRESH_TOKEN ? '60d' : '15m',
+      ),
+    });
+  }
+
+  async generateRefreshToken(user: User, clientInfo: ClientInfo) {
+    const tokenDuration = this.configService.get<string>(
+      'JWT_REFRESH_TOKEN_EXP',
+      '60d',
+    );
 
     const sessionData: CreateSessionDto = {
       clientUUID: clientInfo.clientUUID,
-      expiration: this.configService.get<string>(
-        'JWT_REFRESH_TOKEN_EXP',
-        '60d',
-      ),
+      expiration: dayjs().add(parseInt(tokenDuration), 'day').toISOString(),
       ipAddress: clientInfo.ipAddress,
       userAgent: clientInfo.userAgent,
       userId: user.id,
@@ -43,49 +82,28 @@ export class TokenService {
       throw new Error('Failed to create session or retrieve clientUUID');
     }
 
-    userPayload.uuid = session.clientUUID;
-
-    const refreshToken = this.jwtService.sign(userPayload);
-
-    return refreshToken;
+    return this.generateToken(
+      user,
+      clientInfo,
+      TokenType.REFRESH_TOKEN,
+      session.clientUUID,
+    );
   }
 
   generateAccessToken(user: User, sessionUUID: string, clientInfo: ClientInfo) {
-    const userPayload: AuthToken = {
+    return this.generateToken(
       user,
       clientInfo,
-      type: TokenType.ACCESS_TOKEN,
-      uuid: sessionUUID,
-    };
-
-    const accessToken = this.jwtService.sign(userPayload, {
-      expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXP', '15m'),
-    });
-
-    return accessToken;
+      TokenType.ACCESS_TOKEN,
+      sessionUUID,
+    );
   }
 
   validateRefreshToken(token: string): AuthToken {
-    const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
-      secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
-    });
-
-    if (payload.type !== TokenType.REFRESH_TOKEN) {
-      throw new InvalidTokenException('Invalid refresh token type');
-    }
-
-    return payload;
+    return this.validateToken(token, TokenType.REFRESH_TOKEN);
   }
 
   validateAccessToken(token: string): AuthToken {
-    const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
-      secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
-    });
-
-    if (payload.type !== TokenType.ACCESS_TOKEN) {
-      throw new InvalidTokenException('Invalid access token type');
-    }
-
-    return payload;
+    return this.validateToken(token, TokenType.ACCESS_TOKEN);
   }
 }
