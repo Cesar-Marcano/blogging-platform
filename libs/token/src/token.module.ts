@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { SessionService } from './session/session.service';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -16,23 +17,9 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       }),
       inject: [ConfigService],
     }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'auth',
-            brokers: ['localhost:9092'],
-          },
-          consumer: {
-            groupId: 'auth',
-          },
-        },
-      },
-    ]),
+    SessionModule,
   ],
-  providers: [TokenService],
+  providers: [TokenService, SessionService],
   exports: [TokenService],
 })
 export class TokenModule {}
