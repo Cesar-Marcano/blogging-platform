@@ -1,12 +1,31 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/blogging-platform/src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "webpack": true
+    "webpack": true,
+    "tsConfigPath": "apps/blogging-platform/tsconfig.app.json"
   },
   "projects": {
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth/tsconfig.app.json"
+      }
+    },
+    "blogging-platform": {
+      "type": "application",
+      "root": "apps/blogging-platform",
+      "entryFile": "main",
+      "sourceRoot": "apps/blogging-platform/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/blogging-platform/tsconfig.app.json"
+      }
+    },
     "common-dtos": {
       "type": "library",
       "root": "libs/common-dtos",
@@ -34,5 +53,7 @@
         "tsConfigPath": "libs/user/tsconfig.lib.json"
       }
     }
-  }
+  },
+  "monorepo": true,
+  "root": "apps/blogging-platform"
 }
