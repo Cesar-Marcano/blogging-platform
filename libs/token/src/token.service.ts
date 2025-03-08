@@ -20,20 +20,20 @@ export class TokenService {
   private validateToken(token: string, tokenType: TokenType): AuthToken {
     try {
       const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
-        secret: this.configService.get<string>(`JWT_${tokenType}_TOKEN_SECRET`),
+        secret: this.configService.get<string>(
+          `JWT_${TokenType[tokenType]}_TOKEN_SECRET`,
+        ),
       });
 
       if (payload.type !== tokenType) {
         throw new InvalidTokenException(
-          `Invalid ${String(tokenType).toLowerCase()} token type`,
+          `Invalid ${TokenType[tokenType]} token type`,
         );
       }
 
       return payload;
     } catch {
-      throw new InvalidTokenException(
-        `Invalid ${String(tokenType).toLowerCase()} token`,
-      );
+      throw new InvalidTokenException(`Invalid ${TokenType[tokenType]} token`);
     }
   }
 
