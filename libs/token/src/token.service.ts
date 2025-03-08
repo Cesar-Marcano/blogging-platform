@@ -6,6 +6,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { CreateSessionDto } from 'apps/auth/src/session/dto/create-session.dto';
 import { ConfigService } from '@nestjs/config';
+import { InvalidTokenException } from '@app/errors/invalidToken.error';
 
 @Injectable()
 export class TokenService {
@@ -38,6 +39,10 @@ export class TokenService {
       this.authClient.emit('session.create', sessionData),
     );
 
+    if (!session || !session.clientUUID) {
+      throw new Error('Failed to create session or retrieve clientUUID');
+    }
+
     userPayload.uuid = session.clientUUID;
 
     const refreshToken = this.jwtService.sign(userPayload);
@@ -58,5 +63,29 @@ export class TokenService {
     });
 
     return accessToken;
+  }
+
+  validateRefreshToken(token: string): AuthToken {
+    const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
+      secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+    });
+
+    if (payload.type !== TokenType.REFRESH_TOKEN) {
+      throw new InvalidTokenException('Invalid refresh token type');
+    }
+
+    return payload;
+  }
+
+  validateAccessToken(token: string): AuthToken {
+    const payload: AuthToken = this.jwtService.verify<AuthToken>(token, {
+      secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+    });
+
+    if (payload.type !== TokenType.ACCESS_TOKEN) {
+      throw new InvalidTokenException('Invalid access token type');
+    }
+
+    return payload;
   }
 }

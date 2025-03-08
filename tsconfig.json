@@ -24,6 +24,12 @@
       "@app/common-dtos/*": [
         "libs/common-dtos/src/*"
       ],
+      "@app/errors": [
+        "libs/errors/src"
+      ],
+      "@app/errors/*": [
+        "libs/errors/src/*"
+      ],
       "@app/prisma": [
         "libs/prisma/src"
       ],
