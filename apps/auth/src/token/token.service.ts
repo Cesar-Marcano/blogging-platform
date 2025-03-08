@@ -4,7 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
 import { ClientInfo, AuthToken, TokenType } from './interface/authToken';
 import { InvalidTokenException } from '@app/errors/invalidToken.error';
-import { SessionService } from './session/session.service';
+import { SessionService } from '../session/session.service';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class TokenService {
@@ -103,7 +104,20 @@ export class TokenService {
     user: User,
     clientInfo: ClientInfo,
   ): Promise<string> {
-    const session = await this.sessionService.createSession(clientInfo, user);
+    const expirationDate = dayjs()
+      .add(
+        parseInt(
+          this.configService.get<string>('JWT_REFRESH_TOKEN_EXP', '60d'),
+        ),
+        'day',
+      )
+      .toISOString();
+
+    const session = await this.sessionService.createSession(
+      user.id,
+      expirationDate,
+      clientInfo,
+    );
 
     return this.generateToken(
       user,

@@ -1,5 +1,5 @@
 import { PrismaService } from '@app/prisma';
-import { ClientInfo } from '@app/token/interface/authToken';
+import { ClientInfo } from 'apps/auth/src/token/interface/authToken';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

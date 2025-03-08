@@ -36,12 +36,6 @@
       "@app/prisma/*": [
         "libs/prisma/src/*"
       ],
-      "@app/token": [
-        "libs/token/src"
-      ],
-      "@app/token/*": [
-        "libs/token/src/*"
-      ],
       "@app/user": [
         "libs/user/src"
       ],

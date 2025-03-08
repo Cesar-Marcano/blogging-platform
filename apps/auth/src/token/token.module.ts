@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SessionService } from './session/session.service';
-import { SessionModule } from './session/session.module';
+import { SessionModule } from '../session/session.module';
 
 @Module({
   imports: [
@@ -19,7 +18,7 @@ import { SessionModule } from './session/session.module';
     }),
     SessionModule,
   ],
-  providers: [TokenService, SessionService],
+  providers: [TokenService],
   exports: [TokenService],
 })
 export class TokenModule {}
